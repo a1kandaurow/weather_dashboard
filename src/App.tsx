@@ -1,13 +1,24 @@
-import { useState } from 'react';
-import { WeatherData, ForecastDay, HourlyForecast, SavedCity } from './types/weather';
-import { getCurrentWeather, getForecast, getHourlyForecast } from './services/weatherApi';
-import { useLocalStorage } from './hooks/useLocalStorage';
-import Search from './components/Search';
-import CurrentWeather from './components/CurrentWeather';
-import Forecast from './components/Forecast';
-import TemperatureChart from './components/TemperatureChart';
-import SavedCities from './components/SavedCities';
-import ErrorMessage from './components/ErrorMessage';
+import { useState } from "react";
+import { useLocalStorage } from "./hooks/useLocalStorage";
+
+import {
+  WeatherData,
+  ForecastDay,
+  HourlyForecast,
+  SavedCity,
+} from "./types/weather";
+import {
+  getCurrentWeather,
+  getForecast,
+  getHourlyForecast,
+} from "./services/weatherApi";
+
+import Search from "./components/Search";
+import CurrentWeather from "./components/CurrentWeather";
+import Forecast from "./components/Forecast";
+import TemperatureChart from "./components/TemperatureChart";
+import ErrorMessage from "./components/ErrorMessage";
+import CitySidebar from "./components/CitySidebar";
 
 function App() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -15,24 +26,25 @@ function App() {
   const [hourlyData, setHourlyData] = useState<HourlyForecast[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [savedCities, setSavedCities] = useLocalStorage<SavedCity[]>('saved-cities', []);
+  const [savedCities, setSavedCities] = useLocalStorage<SavedCity[]>(
+    "saved-cities",
+    [],
+  );
 
   const handleSearch = async (city: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const [weatherData, forecastData, hourlyForecastData] = await Promise.all([
-        getCurrentWeather(city),
-        getForecast(city),
-        getHourlyForecast(city),
-      ]);
+      const [weatherData, forecastData, hourlyForecastData] = await Promise.all(
+        [getCurrentWeather(city), getForecast(city), getHourlyForecast(city)],
+      );
 
       setWeather(weatherData);
       setForecast(forecastData);
       setHourlyData(hourlyForecastData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Произошла ошибка');
+      setError(err instanceof Error ? err.message : "Произошла ошибка");
       setWeather(null);
       setForecast([]);
       setHourlyData([]);
@@ -45,14 +57,15 @@ function App() {
     if (!weather) return;
 
     const cityExists = savedCities.some(
-      (city) => city.name === weather.city && city.country === weather.country
+      (city) => city.name === weather.city && city.country === weather.country,
     );
 
     if (cityExists) {
       setSavedCities(
         savedCities.filter(
-          (city) => !(city.name === weather.city && city.country === weather.country)
-        )
+          (city) =>
+            !(city.name === weather.city && city.country === weather.country),
+        ),
       );
     } else {
       setSavedCities([
@@ -70,13 +83,20 @@ function App() {
   const handleRemoveCity = (cityToRemove: SavedCity) => {
     setSavedCities(
       savedCities.filter(
-        (city) => !(city.name === cityToRemove.name && city.country === cityToRemove.country)
-      )
+        (city) =>
+          !(
+            city.name === cityToRemove.name &&
+            city.country === cityToRemove.country
+          ),
+      ),
     );
   };
 
   const isCitySaved = weather
-    ? savedCities.some((city) => city.name === weather.city && city.country === weather.country)
+    ? savedCities.some(
+        (city) =>
+          city.name === weather.city && city.country === weather.country,
+      )
     : false;
 
   return (
@@ -91,51 +111,67 @@ function App() {
           </p>
         </div>
 
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
-          <SavedCities
-            cities={savedCities}
-            onSelectCity={handleSearch}
-            onRemoveCity={handleRemoveCity}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Левая панель - сохранённые города */}
+          <div className="lg:col-span-1">
+            <CitySidebar
+              cities={savedCities}
+              onSelectCity={handleSearch}
+              onRemoveCity={handleRemoveCity}
+              currentCity={weather?.city}
+            />
+          </div>
 
-          <Search onSearch={handleSearch} isLoading={isLoading} />
+          {/* Основной контент */}
+          <div className="lg:col-span-3">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
+              <Search onSearch={handleSearch} isLoading={isLoading} />
 
-          {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
-
-          {weather && (
-            <div className="space-y-6">
-              <CurrentWeather
-                weather={weather}
-                onSaveCity={handleSaveCity}
-                isSaved={isCitySaved}
-              />
-
-              {hourlyData.length > 0 && <TemperatureChart data={hourlyData} />}
-
-              {forecast.length > 0 && <Forecast forecast={forecast} />}
-            </div>
-          )}
-
-          {!weather && !isLoading && !error && (
-            <div className="text-center py-16">
-              <svg
-                className="w-24 h-24 mx-auto text-gray-300 dark:text-gray-600 mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+              {error && (
+                <ErrorMessage
+                  message={error}
+                  onDismiss={() => setError(null)}
                 />
-              </svg>
-              <p className="text-xl text-gray-500 dark:text-gray-400">
-                Введите название города для просмотра погоды
-              </p>
+              )}
+
+              {weather && (
+                <div className="space-y-6">
+                  <CurrentWeather
+                    weather={weather}
+                    onSaveCity={handleSaveCity}
+                    isSaved={isCitySaved}
+                  />
+
+                  {hourlyData.length > 0 && (
+                    <TemperatureChart data={hourlyData} />
+                  )}
+
+                  {forecast.length > 0 && <Forecast forecast={forecast} />}
+                </div>
+              )}
+
+              {!weather && !isLoading && !error && (
+                <div className="text-center py-16">
+                  <svg
+                    className="w-24 h-24 mx-auto text-gray-300 dark:text-gray-600 mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
+                    />
+                  </svg>
+                  <p className="text-xl text-gray-500 dark:text-gray-400">
+                    Введите название города для просмотра погоды
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
