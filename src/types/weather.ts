@@ -11,6 +11,7 @@ export interface WeatherData {
   timestamp: number;
   lat: number;
   lon: number;
+  weatherMain: string;
 }
 
 export interface ForecastDay {

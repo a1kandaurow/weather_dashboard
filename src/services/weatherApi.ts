@@ -30,6 +30,7 @@ export async function getCurrentWeather(city: string): Promise<WeatherData> {
     timestamp: data.dt,
     lat: data.coord.lat,
     lon: data.coord.lon,
+    weatherMain: data.weather[0].main.toLowerCase(),
   };
 }
 
