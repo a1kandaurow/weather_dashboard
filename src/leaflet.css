@@ -1,0 +1,7 @@
+/* Импорт базовых стилей Leaflet */
+@import 'leaflet/dist/leaflet.css';
+
+/* Фикс для иконок маркеров в Vite */
+.leaflet-default-icon-path {
+  background-image: url('https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png');
+}

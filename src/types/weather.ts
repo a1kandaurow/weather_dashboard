@@ -9,6 +9,8 @@ export interface WeatherData {
   windSpeed: number;
   pressure: number;
   timestamp: number;
+  lat: number;
+  lon: number;
 }
 
 export interface ForecastDay {

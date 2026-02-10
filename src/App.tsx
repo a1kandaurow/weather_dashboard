@@ -19,6 +19,7 @@ import Forecast from "./components/Forecast";
 import TemperatureChart from "./components/TemperatureChart";
 import ErrorMessage from "./components/ErrorMessage";
 import CitySidebar from "./components/CitySidebar";
+import CityMap from "./components/CityMap";
 
 function App() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -73,8 +74,8 @@ function App() {
         {
           name: weather.city,
           country: weather.country,
-          lat: 0, // В текущей версии API не возвращает координаты
-          lon: 0,
+          lat: weather.lat, // теперь реальные координаты
+          lon: weather.lon, // теперь реальные координаты
         },
       ]);
     }
@@ -110,10 +111,9 @@ function App() {
             Актуальная погода и прогноз на 5 дней
           </p>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
           {/* Левая панель - сохранённые города */}
-          <div className="lg:col-span-1">
+          <div className="xl:col-span-3">
             <CitySidebar
               cities={savedCities}
               onSelectCity={handleSearch}
@@ -123,7 +123,7 @@ function App() {
           </div>
 
           {/* Основной контент */}
-          <div className="lg:col-span-3">
+          <div className="xl:col-span-6">
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
               <Search onSearch={handleSearch} isLoading={isLoading} />
 
@@ -171,6 +171,37 @@ function App() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Правая панель - карта */}
+          <div className="xl:col-span-3 min-h-[500px]">
+            {weather ? (
+              <CityMap
+                cityName={weather.city}
+                lat={weather.lat}
+                lon={weather.lon}
+                temperature={weather.temperature}
+              />
+            ) : (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl h-full flex items-center justify-center">
+                <div className="text-center text-gray-400 dark:text-gray-500">
+                  <svg
+                    className="w-16 h-16 mx-auto mb-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                    />
+                  </svg>
+                  <p className="text-sm">Выберите город</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

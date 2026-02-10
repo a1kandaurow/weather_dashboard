@@ -152,65 +152,67 @@ export default function CitySidebar({
                 </svg>
               </button>
 
-              <div className="flex items-center justify-between pr-8">
-                <div>
+              <div className="flex items-start sm:items-center justify-between pr-8 gap-2">
+                <div className="flex-1 min-w-0">
                   <h3
-                    className={`font-bold text-lg ${isActive ? "text-white" : "text-gray-800 dark:text-white"}`}
+                    className={`font-bold text-base sm:text-lg truncate ${isActive ? "text-white" : "text-gray-800 dark:text-white"}`}
                   >
                     {city.name}
                   </h3>
                   <p
-                    className={`text-sm ${isActive ? "text-white/80" : "text-gray-500 dark:text-gray-400"}`}
+                    className={`text-xs sm:text-sm ${isActive ? "text-white/80" : "text-gray-500 dark:text-gray-400"}`}
                   >
                     {city.country}
                   </p>
                   {weatherData?.description && (
                     <p
-                      className={`text-xs mt-1 capitalize ${isActive ? "text-white/70" : "text-gray-400 dark:text-gray-500"}`}
+                      className={`text-xs mt-1 capitalize line-clamp-1 ${isActive ? "text-white/70" : "text-gray-400 dark:text-gray-500"}`}
                     >
                       {weatherData.description}
                     </p>
                   )}
                 </div>
 
-                {weatherData?.isLoading ? (
-                  <div className="animate-spin">
-                    <svg
-                      className={`w-8 h-8 ${isActive ? "text-white/50" : "text-gray-400"}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                  </div>
-                ) : weatherData?.temperature !== undefined ? (
-                  <div className="flex items-center">
-                    {weatherData.icon && (
-                      <img
-                        src={getWeatherIconUrl(weatherData.icon)}
-                        alt=""
-                        className="w-12 h-12"
-                      />
-                    )}
-                    <span
-                      className={`text-3xl font-bold ${isActive ? "text-white" : "text-gray-800 dark:text-white"}`}
-                    >
-                      {weatherData.temperature}°
-                    </span>
-                  </div>
-                ) : null}
+                <div className="flex-shrink-0">
+                  {weatherData?.isLoading ? (
+                    <div className="animate-spin">
+                      <svg
+                        className={`w-6 h-6 sm:w-8 sm:h-8 ${isActive ? "text-white/50" : "text-gray-400"}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                    </div>
+                  ) : weatherData?.temperature !== undefined ? (
+                    <div className="flex flex-col sm:flex-row items-center gap-0 sm:gap-1">
+                      {weatherData.icon && (
+                        <img
+                          src={getWeatherIconUrl(weatherData.icon)}
+                          alt=""
+                          className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0"
+                        />
+                      )}
+                      <span
+                        className={`text-xl sm:text-2xl lg:text-3xl font-bold whitespace-nowrap ${isActive ? "text-white" : "text-gray-800 dark:text-white"}`}
+                      >
+                        {weatherData.temperature}°
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
           );
